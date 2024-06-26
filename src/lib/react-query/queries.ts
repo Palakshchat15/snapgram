@@ -55,28 +55,15 @@ export const useSignOutAccount = () => {
 // POST QUERIES
 // ============================================================
 
-import { Models } from "appwrite";
 export const useGetPosts = () => {
-  return useInfiniteQuery<
-    { documents: Models.Document[] },
-    unknown,
-    {
-      pages: { documents: Models.Document[] }[];
-      pageParams: (number | null[])[];
-    }
-  >({
+  return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: async ({ pageParam}) => {
-      const response = await getInfinitePosts(pageParam);
-      return response;
-    },
-    getNextPageParam: (lastPage) => {
-      // If there's no data, there are no more pages.
-      if (lastPage && lastPage.documents.length === 0) {
-        return null;
-      }
-      // Use the $id of the last document as the cursor.
-      const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
+    queryFn: getInfinitePosts as any,
+    initialPageParam: undefined, 
+    getNextPageParam: (lastPage: any) => {
+      if (lastPage && lastPage?.documents?.length === 0) return null;
+
+      const lastId = lastPage?.documents[lastPage?.documents.length - 1].$id;
       return lastId;
     },
   });
